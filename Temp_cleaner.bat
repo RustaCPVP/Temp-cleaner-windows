@@ -1,0 +1,77 @@
+@echo off
+REM Temporary Files Cleanup Script
+REM This script deletes temporary files from common Windows temp directories
+
+setlocal enabledelayedexpansion
+
+echo.
+echo ========================================
+echo Temporary Files Cleanup Script
+echo ========================================
+echo.
+echo This script will clean:
+echo.
+echo - C:\Windows\Temp
+echo - %TEMP% (User Temp folder)
+echo - C:\Windows\Prefetch
+echo.
+echo ========================================
+echo.
+echo Do you want to continue?
+echo.
+set /p choice="Enter choice (1=Yes, 0=No): "
+
+if "%choice%"=="0" (
+    echo Cleanup cancelled.
+    pause
+    exit /b
+)
+
+if not "%choice%"=="1" (
+    echo Invalid choice. Please enter 1 or 0.
+    pause
+    exit /b
+)
+
+echo.
+echo Starting cleanup...
+echo.
+
+REM Counter for deleted files
+set /a deleted=0
+
+REM Clean Windows Temp folder
+echo Cleaning C:\Windows\Temp...
+for /d %%X in (C:\Windows\Temp\*) do (
+    rmdir /s /q "%%X" 2>nul
+    if !errorlevel! equ 0 (
+        set /a deleted+=1
+    )
+)
+del /q C:\Windows\Temp\* 2>nul
+
+REM Clean User Temp folder
+echo Cleaning %TEMP%...
+for /d %%X in (%TEMP%\*) do (
+    rmdir /s /q "%%X" 2>nul
+    if !errorlevel! equ 0 (
+        set /a deleted+=1
+    )
+)
+del /q %TEMP%\* 2>nul
+
+REM Clean Prefetch (optional - requires admin)
+echo Cleaning Prefetch cache...
+del /q C:\Windows\Prefetch\* 2>nul
+
+REM Clean Recycle Bin (optional - uncomment to enable)
+REM echo Emptying Recycle Bin...
+REM rd /s /q %SystemDrive%\$Recycle.bin 2>nul
+
+echo.
+echo ========================================
+echo Cleanup Complete!
+echo ========================================
+echo.
+pause
+endlocal
